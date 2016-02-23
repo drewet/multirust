@@ -19,8 +19,8 @@ Features:
 * Verify hashes of downloads.
 * Verify signatures (if GPG is available).
 * Resume partial downloads.
-* Requires only Bourne shell, curl and common unix utilities.
-* For Linux and OS X (Windows MSYS support pending).
+* Requires only bash, curl and common unix utilities.
+* For Linux, OS X, and Windows (via MSYS2).
 
 # Quick installation
 
@@ -29,7 +29,7 @@ curl -sf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | 
 ```
 
 This will build and install multirust, possibly prompting you for your
-password via `sudo`. It will then download and install the nightly
+password via `sudo`. It will then download and install the stable
 toolchain, configuring it as the default when executing `rustc`,
 `rustdoc`, and `cargo`.
 
@@ -56,7 +56,7 @@ Run `sudo ./install.sh --uninstall` to uninstall.
 Run `multirust default nightly` to download and install the nightly
 compiler and package manager and configure it as the default.
 
-As an example customization, to install with underneath your home
+As an example customization, to install underneath your home
 directory in e.g. `~/my_stuff/bin/multirust`, you could use:
 
 ```
@@ -68,6 +68,9 @@ directory in e.g. `~/my_stuff/bin/multirust`, you could use:
 Run `./build.sh && ./install.sh --help` to see a list of available options.
 
 # Usage
+
+To install Rust, run `multirust update <toolchain>`. See `multirust help update` for
+details and to configure what this will install.
 
 Overriding the compiler in specific directories:
 
@@ -100,11 +103,16 @@ created.
 Check for updates with `multirust update nightly`. All three release
 channels can be updated at once with `multirust update`.
 
-The `multirust run` command will run an arbitrary in an environment
+`multirust run` will run an arbitrary command in an environment
 configured for a given toolchain, so e.g. `multirust run beta cargo
 build` will run the beta cargo, regardless of the current
 override. This can also be used to e.g. open a beta shell like
 `multirust run beta bash`.
+
+Commands can be abbreviated by using a prefix of the intended command,
+for example `multirust ru` (`run`) or `multirust s-o` (`show-override`).
+In the case of an ambiguous prefix, it picks the first match using the
+order of commands shown in `multirust help`.
 
 # Toolchain specification
 
@@ -115,7 +123,7 @@ will periodically notify you of available updates. All three channels
 can be optionally appended with an archive date, as in
 'nightly-2014-12-18', in which case the toolchain is downloaded from
 the archive for that date (if available). Any other specifier is
-considered an explict Rust version number, as in '0.12.0', or a custom
+considered an explicit Rust version number, as in '0.12.0', or a custom
 toolchain identifier, depending on context.
 
 # Custom toolchains
@@ -172,9 +180,11 @@ dynamic linking, even though the toolchains live in various places.
 It keeps Cargo's metadata isolated per toolchain via the `CARGO_HOME`
 environment variable.
 
-`multirust` saves settings and toolchains per user in `~/.multirust`. 
-The directory is initialized when using the `multirust` command to 
+`multirust` saves settings and toolchains per user in `~/.multirust`.
+The directory is initialized when using the `multirust` command to
 set the default channel, or when setting an override or updating for first time.
+The name of this directory can be controlled with the `MULTIRUST_HOME`
+environment variable.
 
 # Can you trust Rust binaries?
 
@@ -235,7 +245,6 @@ quite meager though so it's unlikely to help.
 * The `rustc`, `cargo` and `rustdoc` commands should be symlinks to
   `multirustproxy` but are actually copies, a limitation of the
   installer.
-* Definitely broken on windows.
 * Concurrent writing of `multirust`'s metadata can possibly cause
   minor data loss in limited circumstances.
 * Paths with semicolons in their names will cause breakage when configured
